@@ -43,7 +43,7 @@ export default function Home() {
         body: JSON.stringify({
           recipient_email: recipient,
           message: message,
-          deliver_at: deliveryDate
+          deliver_at: new Date(deliveryDate).toISOString()
         })
       });
 
