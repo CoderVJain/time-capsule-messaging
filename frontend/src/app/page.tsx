@@ -4,6 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+interface Message {
+  id: number;
+  recipient_email: string;
+  message: string;
+  deliver_at: string;
+  status: string;
+  created_at: string;
+}
+
 export default function Home() {
   const router = useRouter();
   const [recipient, setRecipient] = useState('');
@@ -11,10 +20,38 @@ export default function Home() {
   const [deliveryDate, setDeliveryDate] = useState('');
   const [status, setStatus] = useState({ type: '', text: '' });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [pastMessages, setPastMessages] = useState<Message[]>([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+
+  const fetchMessages = async () => {
+    try {
+      setLoadingMessages(true);
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${apiUrl}/messages`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPastMessages(data.data || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch messages', err);
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
+    if (token) {
+      fetchMessages();
+    }
   }, []);
 
   const handleSignOut = () => {
@@ -61,6 +98,7 @@ export default function Home() {
       setRecipient('');
       setMessage('');
       setDeliveryDate('');
+      fetchMessages();
     } catch (err: any) {
       setStatus({ type: 'error', text: err.message || 'Something went wrong.' });
     }
@@ -133,9 +171,9 @@ export default function Home() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="deliveryDate" className="block text-sm font-medium text-gray-700">Delivery Date</label>
+              <label htmlFor="deliveryDate" className="block text-sm font-medium text-gray-700">Delivery Date & Time</label>
               <input 
-                type="date" 
+                type="datetime-local" 
                 id="deliveryDate"
                 value={deliveryDate}
                 onChange={(e) => setDeliveryDate(e.target.value)}
@@ -154,6 +192,35 @@ export default function Home() {
           </form>
 
         </div>
+        </div>
+
+        {isLoggedIn && (
+          <div className="mt-24 border-t border-gray-200 pt-16">
+            <h3 className="text-3xl font-semibold mb-8 tracking-tight">Your Sealed Capsules</h3>
+            {loadingMessages ? (
+              <p className="text-gray-500">Loading capsules...</p>
+            ) : pastMessages.length === 0 ? (
+              <p className="text-gray-500 text-lg">You haven't sealed any capsules yet.</p>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2">
+                {pastMessages.map((msg) => (
+                  <div key={msg.id} className="bg-white border border-gray-200 p-6 sm:p-8 rounded-2xl shadow-sm flex flex-col justify-between">
+                    <div>
+                        <span className={`inline-block px-3 py-1 text-xs font-semibold tracking-wide uppercase rounded-full mb-6 ${msg.status === 'pending' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}`}>
+                          {msg.status}
+                        </span>
+                        <p className="text-gray-900 font-medium truncate mb-2 text-lg">To: {msg.recipient_email}</p>
+                        <p className="text-gray-500 leading-relaxed line-clamp-3 mb-6">{msg.message}</p>
+                    </div>
+                    <div className="text-sm font-medium text-gray-500 border-t border-gray-100 pt-6 mt-auto">
+                      <p>Deliver at: {new Date(msg.deliver_at).toLocaleString()}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </div>
   );
