@@ -5,23 +5,23 @@ exports.createMessage = async (req, res) => {
     const { recipient_email, message, deliver_at } = req.body;
     const userId = req.user.id;
 
-    // Validate required fields
+    
     if (!recipient_email || !message || !deliver_at) {
       return res.status(400).json({ error: 'recipient_email, message, and deliver_at are required' });
     }
 
-    // Validate email format
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(recipient_email)) {
       return res.status(400).json({ error: 'Invalid recipient email format' });
     }
 
-    // Validate message length
+    
     if (message.length > 500) {
       return res.status(400).json({ error: 'Message must be 500 characters or less' });
     }
 
-    // Validate deliver_at is in the future
+    
     const deliverDate = new Date(deliver_at);
     if (isNaN(deliverDate.getTime())) {
       return res.status(400).json({ error: 'Invalid deliver_at date format' });

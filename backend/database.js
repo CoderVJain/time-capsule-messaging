@@ -30,7 +30,6 @@ async function initDB() {
       );
     `);
 
-    // Index for efficient scheduler queries
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_messages_pending_delivery
       ON messages (deliver_at) WHERE status = 'pending';
