@@ -42,8 +42,8 @@ export default function Home() {
         },
         body: JSON.stringify({
           recipient_email: recipient,
-          content: message,
-          delivery_time: deliveryDate
+          message: message,
+          deliver_at: deliveryDate
         })
       });
 
