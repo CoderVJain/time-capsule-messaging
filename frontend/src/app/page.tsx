@@ -192,7 +192,6 @@ export default function Home() {
           </form>
 
         </div>
-        </div>
 
         {isLoggedIn && (
           <div className="mt-24 border-t border-gray-200 pt-16">
