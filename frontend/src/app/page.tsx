@@ -33,7 +33,8 @@ export default function Home() {
         throw new Error('Please sign in to send a message.');
       }
       
-      const response = await fetch('http://localhost:3000/messages', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${apiUrl}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
