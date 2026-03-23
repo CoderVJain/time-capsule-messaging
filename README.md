@@ -19,8 +19,8 @@ A REST API backend that allows users to create messages scheduled for future del
 ### Messages (requires `Authorization: Bearer <token>`)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/messages` | Create scheduled message |
-| GET | `/messages` | List all user messages |
+| POST | `/messages/` | Create scheduled message |
+| GET | `/messages/` | List all user messages |
 
 ### Create Message Body
 ```json
