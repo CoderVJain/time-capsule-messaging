@@ -25,7 +25,7 @@ exports.register = async (req, res) => {
     }
 
     
-    const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]); 
     if (existing.rows.length > 0) {
       return res.status(409).json({ error: 'Email already registered' });
     }

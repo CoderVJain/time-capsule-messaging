@@ -12,7 +12,7 @@ function appendLog(entry) {
 async function deliverPendingMessages() {
   const client = await pool.connect();
   try {
-    // Find all messages that are due for delivery
+
     const result = await client.query(
       `SELECT id, recipient_email, message FROM messages
        WHERE status = 'pending' AND deliver_at <= NOW()`
@@ -42,14 +42,14 @@ async function deliverPendingMessages() {
 }
 
 function startScheduler() {
-  // Run every minute
+
   cron.schedule('* * * * *', () => {
     deliverPendingMessages();
   });
 
   console.log('Delivery scheduler started (runs every minute)');
 
-  // Also run immediately on startup to catch any messages missed during downtime
+
   deliverPendingMessages();
 }
 
